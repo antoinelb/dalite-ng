@@ -11,6 +11,7 @@ from .generators import (
     new_student_assignments,
     new_students,
 )
+from .utils import add_to_group
 
 
 @pytest.fixture
@@ -54,3 +55,15 @@ def student_assignments(students, student_group_assignments):
             students,
         )
     )
+
+
+@pytest.fixture
+def students_with_assignment(student_group_assignment):
+    students = add_students(new_students(20))
+    add_to_group(students, student_group_assignment.group)
+    add_student_assignments(
+        new_student_assignments(
+            len(students), student_group_assignment, students
+        )
+    )
+    return students
