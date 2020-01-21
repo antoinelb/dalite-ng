@@ -24,6 +24,7 @@ from django.db.models import (
 from django.utils.safestring import mark_safe
 
 logger = logging.getLogger("peerinst_console_log")
+logger_scheduled = logging.getLogger("peerinst-scheduled")
 
 
 def get_object_or_none(model_class, *args, **kwargs):
@@ -194,7 +195,7 @@ def load_log_archive(json_log_archive):
     return
 
 
-def load_timestamps_from_logs(log_filename_list):
+def load_timestamps_from_logs(log_filename):
     """
     function to parse log files and add timestamps to previous records in
     Answer model with newly added time field
@@ -212,58 +213,102 @@ def load_timestamps_from_logs(log_filename_list):
     from peerinst.models import Answer
     from django.conf import settings
 
+    # need to overwrite all values of answer.datetime_start
+    answer_objects_updated = Answer.objects.filter(
+        datetime_start__isnull=False
+    ).count()
+    Answer.objects.filter(datetime_start__isnull=False).update(
+        datetime_start=None
+    )
+    logger_scheduled.info(
+        "{} answer objects with datetime_start deleted".format(
+            answer_objects_updated
+        )
+    )
+
     # load logs
-    logs = []
-    for name in log_filename_list:
-        fname = os.path.join(settings.BASE_DIR, "log", name)
-        for line in open(fname, "r"):
+    fname = os.path.join(settings.BASE_DIR, "log", log_filename)
+    problem_show_events = 0
+    problem_check_events = 0
+    skipped_events = 0
+    for line in open(fname, "r"):
+        try:
             log_event = json.loads(line)
-            if log_event["event_type"] == "save_problem_success":
-                logs.append(log_event)
-    print("{} save_problem_success log events".format(len(logs)))
+        except ValueError:
+            continue
+        if (
+            log_event["event_type"] == "problem_check"
+            and "rationales" in log_event["event"]
+        ):
+            skipped_events += 1
+            continue
+        elif log_event["event_type"] == "save_problem_success":
+            # logs.append(log_event)
+            skipped_events += 1
+            # we are ignoring save_problem_success events,
+            # as they have already been handled
+            continue
+        else:
+            answer_obj = get_answer_corresponding_to_ltievent_log(
+                event_json=log_event
+            )
+            event_type = log_event["event_type"]
+            if event_type == "problem_show":
+                field = "datetime_start"
+                problem_show_events += 1
+            elif event_type == "problem_check":
+                field = "datetime_first"
+                problem_check_events += 1
 
-    # get records that don't have a timestamp
-    answer_qs = Answer.objects.filter(time__isnull=True)
+            timestamp = timezone.make_aware(
+                dateparse.parse_datetime(log_event["time"])
+            )
 
-    records_updated = 0
-    records_not_in_logs = 0
+            if answer_obj:
+                # keep the latest time at which student accessed
+                # problem start page,
+                # but earliest time student access peer rationales
+                if getattr(answer_obj, field):
+                    if (
+                        getattr(answer_obj, field) < timestamp
+                        and event_type == "problem_show"
+                    ) or (
+                        getattr(answer_obj, field) > timestamp
+                        and event_type == "problem_check"
+                    ):
+                        setattr(answer_obj, field, timestamp)
+                        answer_obj.save()
+                        logger_scheduled.info(
+                            "parsing file {}-Answer {} -{} updated".format(
+                                log_filename, answer_obj, field
+                            )
+                        )
+                    else:
+                        pass
+                else:
+                    setattr(answer_obj, field, timestamp)
+                    answer_obj.save()
+                    logger_scheduled.info(
+                        "parsing file {} - Answer {} - {} updated".format(
+                            log_filename, answer_obj, field
+                        )
+                    )
 
-    # iterate through each record, find its log entry, and save the timestamp
-    print("{} records to parse".format(len(answer_qs)))
-    print("start time: {}".format(timezone.now()))
-    records_parsed = 0
-    for a in answer_qs:
-        for log in logs:
-            if (
-                (log["username"] == a.user_token)
-                and (log["event"]["assignment_id"] == a.assignment_id)
-                and (log["event"]["question_id"] == a.question_id)
-            ):
-                timestamp = timezone.make_aware(
-                    dateparse.parse_datetime(log["time"])
+            else:
+                logger_scheduled.info(
+                    "Answer Not found : {}-{}-{}".format(
+                        log_event["username"],
+                        log_event["event"]["question_id"],
+                        log_event["event"]["assignment_id"],
+                    )
                 )
-                a.time = timestamp
-                a.save()
-                records_updated += 1
-        if a.time is None:
-            records_not_in_logs += 1
-        records_parsed += 1
-        if records_parsed % 1000 == 0:
-            print("{} db records parsed".format(records_parsed))
-            print("{} db records updated".format(records_updated))
-            print("time: {}".format(timezone.now()))
-
-    print("End time: {}".format(timezone.now()))
-    print(
-        "{} total answer table records in db updated with time field from logs".format(  # noqa
-            records_updated
-        )
+    logger_scheduled.info(
+        "{} problem_show log events".format(problem_show_events)
     )
-    print(
-        "{} total answer table records in db not found in logs; likely seed rationales from teacher backend".format(  # noqa
-            records_updated
-        )
+    logger_scheduled.info(
+        "{} problem_check log events".format(problem_check_events)
     )
+    logger_scheduled.info("{} skipped log events".format(skipped_events))
     return
 
 
