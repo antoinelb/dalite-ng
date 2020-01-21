@@ -686,6 +686,8 @@ class StudentAssignment(models.Model):
                     assignment=self.group_assignment.assignment,
                     user_token=self.student.student.username,
                     question=question,
+                    datetime_start__gte=self.group_assignment.distribution_date,  # noqa
+                    datetime_start__lte=self.group_assignment.due_date,
                 )
                 or [None]
             )[0]

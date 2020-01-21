@@ -32,7 +32,7 @@ def add_answers(
             assignment=assignment,
             user_token=student.student.username,
             first_answer_choice=2 - correct_first,
-            second_answer_choice=2 - correct_second,
+            second_answer_choice=2 - correct_second if answer_second else None,
             datetime_start=datetime.now(pytz.utc)
             if datetime_start is None
             else datetime_start,

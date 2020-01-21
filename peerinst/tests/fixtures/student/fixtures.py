@@ -1,7 +1,9 @@
 import pytest
 
-from ..assignment import student_group_assignment  # noqa
-from ..assignment import student_group_assignments  # noqa
+from ..assignment import (  # noqa
+    student_group_assignment,
+    student_group_assignments,
+)
 from ..tos import consent_to_tos, tos_student  # noqa
 from .generators import (
     add_student_assignments,
