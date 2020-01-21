@@ -1373,3 +1373,159 @@ def test_grade__other_assignments__none_answered_correct_first_and_second(
     )
 
     assert not student_assignment.grade
+
+
+def test_grade__other_assignments__same_time__old_correct_new_incorrect(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=1)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=2
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+
+    assert student_assignment.grade == n
+
+
+def test_grade__other_assignments__same_time__old_incorrect_new_correct(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=1)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=2
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+        datetime_start=old_datetime,
+    )
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+    )
+
+    assert student_assignment.grade == n
+
+
+def test_grade__other_assignments__same_time__both_correct(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=1)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=2
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+        datetime_start=old_datetime,
+    )
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=True,
+        answer_second=True,
+        correct_second=True,
+    )
+
+    assert student_assignment.grade == n
+
+
+def test_grade__other_assignments__same_time__both_incorrect(
+    student_assignment,
+):
+    assignment = student_assignment.group_assignment.assignment
+    questions = assignment.questions.all()
+    student = student_assignment.student
+    n = len(questions)
+    n_first = random.randint(1, n - 1)
+    n_second = random.randint(1, n_first)
+    now = datetime.now(pytz.utc)
+    old_datetime = now - timedelta(weeks=1)
+    student_assignment.group_assignment.due_date = now + timedelta(weeks=1)
+    student_assignment.group_assignment.distribution_date = now - timedelta(
+        weeks=2
+    )
+    student_assignment.group_assignment.save()
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+        datetime_start=old_datetime,
+    )
+
+    add_answers(
+        student,
+        questions,
+        student_assignment.group_assignment.assignment,
+        correct_first=False,
+        answer_second=True,
+        correct_second=False,
+    )
+
+    assert not student_assignment.grade

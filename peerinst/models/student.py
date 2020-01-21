@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from operator import attrgetter
 import logging
 from datetime import datetime
 from operator import itemgetter
@@ -689,9 +690,15 @@ class StudentAssignment(models.Model):
                     datetime_start__gte=self.group_assignment.distribution_date,  # noqa
                     datetime_start__lte=self.group_assignment.due_date,
                 )
-                or [None]
-            )[0]
+                or None
+            )
             for question in self.group_assignment.questions
+        ]
+        answers = [
+            sorted(_answers, key=attrgetter("grade"), reverse=True)[0]
+            if _answers is not None
+            else None
+            for _answers in answers
         ]
 
         return [
