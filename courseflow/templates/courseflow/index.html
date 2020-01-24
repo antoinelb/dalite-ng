@@ -1,0 +1,16 @@
+{% extends 'peerinst/base.html' %}
+
+{% load compress static %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  {% compress css %}
+    <link rel="stylesheet" href="{% static 'courseflow/css/index.min.css' %}"></link>
+  {% endcompress %}
+{% endblock %}
+
+{% block body %}
+  <main>
+    <iframe src="{{ courseflow_url }}" title="CourseFlow"></iframe>
+  </main>
+{% endblock %}

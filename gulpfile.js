@@ -45,6 +45,10 @@ const styleBuilds = [
     app: "analytics",
     modules: [],
   },
+  {
+    app: "courseflow",
+    modules: ["index"],
+  },
 ];
 
 const scriptBuilds = [
