@@ -11,6 +11,13 @@
         </i>
         {% trans 'Home page' %}
       </a>
+      <a class="mdc-list-item" href="{% url 'teacher' user.teacher.pk %}">
+        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
+           aria-hidden="true">
+          account_circle
+        </i>
+        {% trans 'My account' %}
+      </a>
       <a class="mdc-list-item" href="{% url 'browse-database' %}">
         <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
            aria-hidden="true">
@@ -43,13 +50,6 @@
           assignment
         </i>
         {% trans 'Create assignment' %}
-      </a>
-      <a class="mdc-list-item" href="{% url 'teacher' user.teacher.pk %}">
-        <i class="material-icons mdc-list-item__graphic mdc-theme--primary"
-           aria-hidden="true">
-          account_circle
-        </i>
-        {% trans 'My account' %}
       </a>
       {% if request.session.forum_notifications %}
       <a class="mdc-list-item" href="{% url 'pinax_forums:thread_updates' %}">
