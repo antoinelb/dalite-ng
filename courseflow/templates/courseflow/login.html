@@ -1,0 +1,59 @@
+{% extends 'peerinst/base.html' %}
+
+{% load i18n compress static %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'courseflow/css/login.min.css' %}">
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script src="{% static 'courseflow/js/courseflow.min.js' %}" defer></script>
+  <script nonce="{{ request.csp_nonce }}">
+    window.onload = () => {
+      courseflow.login.init({
+        urls: {
+          authenticate: "{% url 'courseflow:authenticate' %}"
+        }
+      })
+    };
+  </script>
+{% endblock %}
+
+{% block body %}
+  <main id="lti-login">
+  <h1 class="mdc-typography--display3">{% trans 'Login' %}
+    <svg class="underline" width=150 height=4></svg>
+  </h1>
+
+  <p id="error-msg"></p>
+
+  <form>
+    {% csrf_token %}
+    <div class="mdc-text-field mdc-text-field--outlined"
+         data-mdc-auto-init="MDCTextField">
+      <input id="username" class="mdc-text-field__input" required autofocus>
+      <label for="username" class="mdc-floating-label">Username</label>
+      <div class="mdc-notched-outline">
+        <svg>
+          <path class="mdc-notched-outline__path"/>
+        </svg>
+      </div>
+      <div class="mdc-notched-outline__idle"></div>
+    </div>
+    <div class="mdc-text-field mdc-text-field--outlined"
+         data-mdc-auto-init="MDCTextField">
+      <input id="password" class="mdc-text-field__input" type="password" required>
+      <label for="password" class="mdc-floating-label">Password</label>
+      <div class="mdc-notched-outline">
+        <svg>
+          <path class="mdc-notched-outline__path"/>
+        </svg>
+      </div>
+      <div class="mdc-notched-outline__idle"></div>
+    </div>
+    <input id="submit-btn" class="mdc-button mdc-button--raised" type="submit" value="{% trans 'Submit' %}"/>
+  </form>
+  </main>
+{% endblock %}

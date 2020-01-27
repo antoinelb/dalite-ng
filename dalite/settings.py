@@ -468,6 +468,8 @@ FRAMING_ALLOWED_FROM = ["*"]
 # Functional tests that scrape web console logs currently require chromedriver
 TESTING_BROWSER = "chrome"
 
+COURSEFLOW_URL = ""
+
 try:
     from .local_settings import *  # noqa F403
 
