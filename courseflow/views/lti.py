@@ -1,9 +1,10 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.models import User
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
+
 from dalite.views.utils import with_json_params
-from django.conf import settings
 
 
 def login(req: HttpRequest) -> HttpResponse:
@@ -78,16 +79,3 @@ def redirect(req: HttpRequest) -> HttpResponse:
     """
     url = settings.COURSEFLOW_URL
     return HttpResponse("localhost:3000/teacher/dashboard")
-
-
-def get_courseflow_courses(req: HttpRequest) -> HttpResponse:
-    """
-    Gets the list of courseflow courses.
-    """
-
-
-@with_json_params(args=["group_id"])
-def update_linked_course(req: HttpRequest, group_id: int) -> HttpResponse:
-    """
-    Updates which course is linked to the `group_id`.
-    """
