@@ -6,7 +6,10 @@ from lti import ToolConsumer
 
 
 def create_consumer(
-    url: str, course_id: Optional[int] = None, course_list: bool = False
+    url: str,
+    username: str,
+    course_id: Optional[int] = None,
+    course_list: bool = False,
 ) -> ToolConsumer:
     consumer = ToolConsumer(
         consumer_key=settings.LTI_CLIENT_KEY,
@@ -25,7 +28,7 @@ def create_consumer(
             "lis_outcome_service_url": url,
             "lis_result_sourcedid": url,
             "roles": "Learner",
-            "user_id": "YW50b2luZWxi",
+            "user_id": username,
         },
     )
 
