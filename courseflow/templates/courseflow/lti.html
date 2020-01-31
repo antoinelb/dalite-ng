@@ -1,24 +1,22 @@
-{% extends 'peerinst/base.html' %}
-
-{% load compress static %}
-
-{% block scripts %}
-  {{ block.super }}
-  <script src="{% static 'courseflow/js/courseflow.min.js' %}" defer></script>
-  <script nonce="{{ request.csp_nonce }}">
-    window.onload = () => {
-      document.getElementById("courseflow-lti").submit();
-    };
-  </script>
-{% endblock %}
-
-{% block body %}
-  <form id="courseflow-lti"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+  <form id="lti"
         action="{{ launch_url }}"
         method="POST"
         encType="application/x-www-form-urlencoded">
-    {% for key, val in launch_data.items() %}
+    {% for key, val in launch_data.items %}
       <input type="hidden" name="{{ key }}" value="{{ val }}">
     {% endfor %}
   </form>
-{% endblock %}
+  <script nonce="{{ request.csp_nonce }}">
+    window.onload = () => {
+      document.getElementById("lti").submit();
+    };
+  </script>
+</body>
+</html>

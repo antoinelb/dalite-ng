@@ -82,10 +82,6 @@ const scriptBuilds = [
     app: "analytics",
     modules: ["teachers"],
   },
-  {
-    app: "courseflow",
-    modules: ["courseflow"],
-  },
 ];
 
 const babelConfig = {
