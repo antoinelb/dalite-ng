@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_POST, require_safe
 
 from dalite.views.utils import with_json_params, with_query_string_params
+from peerinst.models import Teacher
 
 from ..lti import create_consumer
 from .decorators import teacher_required
@@ -74,7 +75,7 @@ def authenticate(
 @teacher_required
 @with_query_string_params(opt_args=["course_id"])
 def courseflow(
-    req: HttpRequest, course_id: Optional[str] = None
+    req: HttpRequest, teacher: Teacher, course_id: Optional[str] = None
 ) -> HttpResponse:
     """
     Redirects to CourseFlow lti using the username and email from the
@@ -83,20 +84,22 @@ def courseflow(
     Parameters
     ----------
     req : HttpRequest
-        Request with a logged in User
+        Request
+    teacher : Teacher
+        Logged in teacher
     course_id : Optional[str] (default : None)
         If this should lead to a specific course on courseflow
 
     Returns
     -------
     HttpResponse
-        The lti page that will redirect to courseflow
-        The redirected respones to COURSEFLOW_URL/lti
+        The lti page that will redirect to courseflow through
+        COURSEFLOW_URL/lti
     """
     url = f"{settings.COURSEFLOW_URL}/lti/"
     if not url.startswith("http"):
         url = f"http://{url}"
-    consumer = create_consumer(url, req.user.username, course_id=course_id)
+    consumer = create_consumer(url, teacher.user.username, course_id=course_id)
     return render(
         req,
         "courseflow/lti.html",
