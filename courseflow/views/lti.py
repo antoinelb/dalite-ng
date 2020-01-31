@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST, require_safe
 from dalite.views.utils import with_json_params, with_query_string_params
 
 from ..lti import create_consumer
+from .decorators import teacher_required
 
 
 @require_safe
@@ -70,6 +71,7 @@ def authenticate(
 
 
 @require_safe
+@teacher_required
 @with_query_string_params(opt_args=["course_id"])
 def courseflow(
     req: HttpRequest, course_id: Optional[str] = None
@@ -81,7 +83,7 @@ def courseflow(
     Parameters
     ----------
     req : HttpRequest
-        Request with possibly a User attacher
+        Request with a logged in User
     course_id : Optional[str] (default : None)
         If this should lead to a specific course on courseflow
 
@@ -94,7 +96,7 @@ def courseflow(
     url = f"{settings.COURSEFLOW_URL}/lti/"
     if not url.startswith("http"):
         url = f"http://{url}"
-    consumer = create_consumer(url, course_id=course_id)
+    consumer = create_consumer(url, req.user.username, course_id=course_id)
     return render(
         req,
         "courseflow/lti.html",
