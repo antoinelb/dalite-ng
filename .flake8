@@ -12,5 +12,5 @@ select = B,B9,BLK,C,D,F,F,S,W
 application-import-names = peerinst,dalite,reputation,quality,tos,analytics
 import-order-style = google
 max-line-length = 79
-per-file-ignores = */tests/*:S101  # allow assert in test files
+per-file-ignores = */tests/*:S101
 docstring-convention = numpy
