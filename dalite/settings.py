@@ -26,6 +26,7 @@ DEV_PORT = 8000  # port used during development
 # Application definition
 
 INSTALLED_APPS = (
+    "lti_",
     "analytics",
     "reputation",
     "quality",
@@ -281,6 +282,18 @@ LOGGING = {
             "formatter": "complete",
             "stream": "ext://sys.stdout",
         },
+        "lti_file_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "complete",
+            "filename": os.path.join(BASE_DIR, "log", "lti.log"),
+        },
+        "lti_console_log": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "complete",
+            "stream": "ext://sys.stdout",
+        },
     },
     "loggers": {
         "django.request": {
@@ -350,6 +363,11 @@ LOGGING = {
         },
         "analytics": {
             "handlers": ["analytics_file_log", "analytics_console_log"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
+        },
+        "lti": {
+            "handlers": ["lti_file_log", "lti_console_log"],
             "level": "DEBUG" if DEBUG else "INFO",
             "propagate": True,
         },
@@ -454,7 +472,7 @@ try:
     from .local_settings import *  # noqa F403
 
     try:
-        INSTALLED_APPS += LOCAL_APPS  # noqa F405
+        INSTALLED_APPS += LOCAL_APPS  # type: ignore # noqa F405
     except NameError:
         pass
 except ImportError:

@@ -1,19 +1,21 @@
 from django.conf import settings
 from django.conf.urls import include
-from django.urls import path
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.urls import path
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 
-from . import views
 from peerinst import views as peerinst_views
+
+from . import views
 
 admin.site.site_header = admin.site.site_title = _("Dalite NG administration")
 
 # LTI
-urlpatterns = [path("lti/", include("django_lti_tool_provider.urls"))]
+#  urlpatterns = [path("lti/", include("django_lti_tool_provider.urls"))]
+urlpatterns = [path("lti/", include("lti_.urls", namespace="lti"))]
 
 # Apps
 urlpatterns += i18n_patterns(
