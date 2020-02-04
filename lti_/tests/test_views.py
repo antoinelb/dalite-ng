@@ -34,11 +34,7 @@ def test_lti__wrong_key_or_secret(client, rf, caplog):
 def test_lti__missing_params(client, rf, caplog):
     consumer = create_consumer(
         rf.post(reverse("lti:lti")).build_absolute_uri(),
-        params={
-            "custom_question_id": "0",
-            "custom_teacher_id": "test",
-            "user_id": "test",
-        },
+        params={"custom_question_id": "0", "user_id": "test"},
     )
     resp = client.post(consumer.launch_url, consumer.generate_launch_data())
     assert resp.status_code == 400
@@ -58,11 +54,7 @@ def test_lti__missing_params(client, rf, caplog):
 
     consumer = create_consumer(
         rf.post(reverse("lti:lti")).build_absolute_uri(),
-        params={
-            "custom_assignment_id": "test",
-            "custom_teacher_id": "test",
-            "user_id": "test",
-        },
+        params={"custom_assignment_id": "test", "user_id": "test"},
     )
     resp = client.post(consumer.launch_url, consumer.generate_launch_data())
     assert resp.status_code == 400
@@ -77,30 +69,6 @@ def test_lti__missing_params(client, rf, caplog):
     ).getMessage() == (
         "An lti request was made with the missing parameter "
         "`custom_question_id`"
-    )
-    caplog.clear()
-
-    consumer = create_consumer(
-        rf.post(reverse("lti:lti")).build_absolute_uri(),
-        params={
-            "custom_assignment_id": "test",
-            "custom_question_id": "0",
-            "user_id": "test",
-        },
-    )
-    resp = client.post(consumer.launch_url, consumer.generate_launch_data())
-    assert resp.status_code == 400
-    assert (
-        "The following parameter is missing in your settings:<br/>"
-        + "\xa0\xa0 - custom_teacher_id"
-        + "<br/>You can find them on your account page on "
-        '<a href="https://mydalite.org">https://mydalite.org</a>.'
-    ) in resp.content.decode()
-    assert next(
-        record for record in caplog.records if record.name == "lti"
-    ).getMessage() == (
-        "An lti request was made with the missing parameter "
-        "`custom_teacher_id`"
     )
     caplog.clear()
 
