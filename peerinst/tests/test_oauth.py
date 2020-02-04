@@ -1,7 +1,6 @@
 import binascii
 import hmac
 import time
-
 from hashlib import sha1
 
 
@@ -21,6 +20,7 @@ def test_oauth_signature(client, settings):
         "user_id": "test",
         "custom_assignment_id": "test-assignment",
         "custom_question_id": "1",
+        "custom_teacher_id": "test",
         "oauth_consumer_key": settings.LTI_CLIENT_KEY,
         "oauth_nonce": "nonce",
         "oauth_signature_method": "HMAC-SHA1",
@@ -40,6 +40,8 @@ def test_oauth_signature(client, settings):
         + oauth_parameters["custom_assignment_id"]
         + "%26custom_question_id%3D"
         + oauth_parameters["custom_question_id"]
+        + "%26custom_teacher_id%3D"
+        + oauth_parameters["custom_teacher_id"]
         + "%26lti_message_type%3D"
         + oauth_parameters["lti_message_type"]
         + "%26lti_version%3D"
