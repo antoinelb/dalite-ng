@@ -50,7 +50,11 @@ def get_permissions_for_staff_user():
 
 
 class ApplicationHookManager(AbstractApplicationHookManager):
-    LTI_KEYS = ["custom_assignment_id", "custom_question_id"]
+    LTI_KEYS = [
+        "custom_assignment_id",
+        "custom_question_id",
+        "custom_teacher_id",
+    ]
     ADMIN_ACCESS_ROLES = {LTIRoles.INSTRUCTOR, LTIRoles.STAFF}
 
     @classmethod
@@ -77,6 +81,7 @@ class ApplicationHookManager(AbstractApplicationHookManager):
         action = lti_data.get("custom_action")
         assignment_id = lti_data.get("custom_assignment_id")
         question_id = lti_data.get("custom_question_id")
+        teacher_id = lti_data.get("custom_teacher_id")
         show_results_view = lti_data.get("custom_show_results_view", "false")
 
         if action == "launch-admin":
