@@ -3,9 +3,9 @@ import json
 import logging
 import random
 import re
-import urllib.request
-import urllib.parse
 import urllib.error
+import urllib.parse
+import urllib.request
 from datetime import datetime
 
 import pytz
@@ -19,7 +19,6 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_admins, send_mail
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.urls import reverse
 
 # reports
 from django.db.models import Count, Q
@@ -28,13 +27,10 @@ from django.forms import Textarea, inlineformset_factory
 
 # blink
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import (
-    get_object_or_404,
-    redirect,
-    render,
-)
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.html import escape, format_html
