@@ -23,7 +23,7 @@ def lti(req: HttpRequest) -> HttpResponse:
                 "You can't access this url directly. Please go through "
                 f"{link} or the link on your class website."
             ),
-            "A direct access was tried",
+            "A direct lti access was tried",
             logger.warning,
         )
     except KeyError as e:
@@ -32,9 +32,22 @@ def lti(req: HttpRequest) -> HttpResponse:
             translate(
                 "The following parameter is missing in your settings:<br>"
                 + "<br>".join(f"&nbsp;&nbsp; - {arg}" for arg in e.args)
+                + f"<br>You can find them on your account page on {link}."
             ),
-            f"An lti request was made with the missing parameter {e.args[0]}",
+            "An lti request was made with the missing "
+            f"parameter `{e.args[0]}`",
             logger.warning,
+        )
+    except TypeError as e:
+        return response_400(
+            req,
+            translate(
+                "Your lti application isn't sending a needed parameter. "
+                "Please contact myDalite support at support@scivero.com."
+            ),
+            "An lti request was made from an application not sending "
+            "the `user_id` parameter.",
+            logger.error,
         )
     if resp.status_code == 400:
         return response_400(
@@ -46,6 +59,6 @@ def lti(req: HttpRequest) -> HttpResponse:
             ),
             "An lti request was made with an error on either the key or "
             "secret.",
-            logger.error,
+            logger.warning,
         )
     return resp
