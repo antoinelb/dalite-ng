@@ -110,4 +110,4 @@ def combine_answers_with_group_membership(
         left_on="user_token",
         right_on="username",
         how="left",
-    )
+    ).drop(columns="user_token")
